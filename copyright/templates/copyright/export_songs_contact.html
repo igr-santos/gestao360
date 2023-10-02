@@ -1,0 +1,53 @@
+{% extends "bootstrap.html" %}
+
+{% block content %}
+<div>
+    {% for song in songs %}
+        <div class="p-5{% if forloop.counter0|divisibleby:2 %} bg-light{% endif %}">
+            <h4>{{song.title}}</h4>
+            <div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Titular</th>
+                            <th scope="col">Categoria</th>
+                            <th scope="col">Participação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for songholder in song.songholder_set.all %}
+                        <tr>
+                            <td>{{ songholder.holder.full_name }}</td>
+                            <td>{{ songholder.get_category_display }}</td>
+                            <td>{{ songholder.royalties_share }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <h6>Contatos</h6>
+            <div class="row">
+                {% for songholder in song.songholder_set.all %}
+                {% if songholder.holder.contactcard_set.count > 0 %}
+                <div class="col">
+                    <div class="card">
+                        <div class="card-header">{{songholder.holder.full_name}}</div>
+                        <ul class="list-group list-group-flush">
+                        {% for contact_card in songholder.holder.contactcard_set.all %}
+                            {% for contact in contact_card.contacts.all %}
+                            <li class="list-group-item d-flex flex-column">
+                                <span><strong>Nome:</strong> {{contact.name}}</span>
+                                <span><strong>{{contact.get_kind_display}}:</strong> {{contact.value}}</span>
+                            </li>
+                            {% endfor %}
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

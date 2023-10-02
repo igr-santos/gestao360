@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:12
+    volumes:
+      - ./postgresql_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: backstage
+      POSTGRES_PASSWORD: "postgres"
+    ports:
+      - "5432:5432"
+  
+  web:
+    image: igr-santos/gestao360:5
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/backstage
+    #   DEBUG=True
+    #   ALLOWED_HOSTS="localhost"
+      

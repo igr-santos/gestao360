@@ -1,0 +1,6 @@
+{% extends "admin/change_list.html" %}
+
+{% block search %}
+{{ block.super }}
+<h2>Earnings: EUR {{ rows_amount_sum }}</h2>
+{% endblock %}

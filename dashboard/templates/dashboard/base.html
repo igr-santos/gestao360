@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Dashboard</title>
+    <link href="{% static 'css/dashboard.css' %}?version=1" rel="stylesheet" />
+  </head>
+  <body class="h-screen">
+    <div class="fixed top-0 w-full block bg-base-300 h-12 z-50">
+      <div class="w-full flex px-4 py-2">
+        <div>
+          <h1 class="text-2xl">APP</h1>
+        </div>
+        <div class="flex flex-1 justify-center gap-4 items-center">
+          <a class="link hover:text-primary-focus flex gap-2" href="{% url 'index' %}" target="_self">Home</a>
+          <span>/</span>
+          <a class="link hover:text-primary-focus flex gap-2" href="{% url 'stakeholders' %}" target="_self">Partes Interessadas</a>
+          <span>/</span>
+          <a class="link link-error flex gap-2 items-center" href="{% url 'logout' %}">
+            <svg class="w-4 h-4 text-error dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 16">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 8h11m0 0L8 4m4 4-4 4m4-11h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-3"></path>
+            </svg>
+            <span>Sair</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="h-screen flex flex-row gap-4 overflow-auto pt-12">
+      {% block sidebar %}
+      {% endblock %}
+      {% block content %}
+      {% endblock %}
+    </div>
+  </body>
+</html>

@@ -1,0 +1,75 @@
+{% extends "dashboard/base.html" %}
+
+{% block sidebar %}
+<div class="w-80 min-h-full bg-base-200 text-base-content relative overflow-auto">
+    <div class="fixed h-6 z-10 bg-slate-200">
+        <h2>Partes Interessadas</h2>
+    </div>
+    <div class="overflow-auto p-4 mt-6">
+        <ul class="overflow-y-auto">
+            {% for obj in stakeholders %}
+            <li>
+                <a class="link text-xs text-left hover:link-primary{% if request.GET.pk|add:"0" == obj.id %} link-primary{% endif %}" href="?pk={{obj.id}}">{{ obj.full_name }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="max-h-screen overflow-auto w-full">
+    <div class="relative w-full py-8">
+        {% if stakeholder %}
+        <div>
+            <h1>{{ stakeholder.artist_name }}</h1>
+            <h3>{{ stakeholder.full_name }}</h3>
+        </div>
+
+        <details tabindex="0" class="collapse" open> 
+            <summary class="collapse-title text-xl font-medium cursor-pointer">Relação de obras</summary>
+            <div class="collapse-content"> 
+                <table class="table table-zebra table-xs w-full">
+                    <thead class="bg-white">
+                        <tr>
+                            <th>Obra</th>
+                            <th>Categoria</th>
+                            <th>Participação</th>
+                        </tr>
+                    </thead>
+                    {% for songholder in songholders %}
+                    <tr>
+                        <td>{{ songholder.song.title }}</td>
+                        <td>{{ songholder.get_category_display }}</td>
+                        <td>{{ songholder.royalties_share }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </details>
+
+        <details tabindex="1" class="collapse" open>
+            <summary class="collapse-title text-xl font-medium cursor-pointer">Relação de fonogramas</summary>
+            <div class="collapse-content">
+                <table class="table table-zebra table-xs w-full">
+                    <thead class="bg-white">
+                        <tr>
+                            <th>Fonograma</th>
+                            <th>Categoria</th>
+                            <th>Participação</th>
+                        </tr>
+                    </thead>
+                    {% for splitline in splitlines %}
+                    <tr>
+                        <td>{{ splitline.split.song.title }}</td>
+                        <td>{{ splitline.get_kind_display }}</td>
+                        <td>{{ splitline.value }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </details>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

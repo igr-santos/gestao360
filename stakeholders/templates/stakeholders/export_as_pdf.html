@@ -1,0 +1,17 @@
+<ul>
+    {% for artist in artists %}
+        <li>
+            <h2>{{artist.full_name}}</h2>
+            <div>
+                <h3>Contatos</h3>
+                {% for contact_card in artist.contactcard_set.all %}
+                    {% for contact in contact_card.contacts.all %}
+                    <hr>
+                    <p><strong>Nome:</strong> {{contact.name}}</p>
+                    <p><strong>{{contact.kind}}:</strong> {{contact.value}}</p>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        </li>
+    {% endfor %}
+</ul>

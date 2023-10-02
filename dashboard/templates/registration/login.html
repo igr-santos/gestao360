@@ -1,0 +1,15 @@
+{% extends "registration/base.html" %}
+
+{% block content %}
+<div class="max-h-screen overflow-auto w-full m-auto">
+    <div class="w-80 mx-auto bg-base-200 p-6">
+    <form class="form" method="POST">
+        {% csrf_token %}
+        <div class="fields">
+            {{ form }}
+        </div>
+        <button class="btn btn-primary" type="submit">Entrar</button>
+    </form>
+    </div>
+</di>
+{% endblock %}
