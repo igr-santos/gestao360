@@ -167,3 +167,4 @@ reports_files/
 dashboard/static/css/dashboard.css
 dashboard/tailwindcss/node_modules/
 reports/datafiles/
+media/

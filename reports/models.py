@@ -16,10 +16,13 @@ class ReportAbstractBase(models.Model):
 
 class DistributionReport(ReportAbstractBase):
     title = models.CharField(max_length=100)
+    amount = models.FloatField(null=True, blank=True)
+    income = models.FloatField(null=True, blank=True)
 
     def __str__(self):
         return self.title
     
-    @property
-    def amount(self):
-        return round(sum(map(lambda x: x['lucro_liquido'], self.json_data)), 2)
+    def update_amount(self):
+        """Update amount field with sum lucro_liquido rows"""
+        if not self.amount:
+            self.amount = sum(map(lambda x: x['lucro_liquido'], self.json_data))

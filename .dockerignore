@@ -51,6 +51,8 @@ reports_files/
 dashboard/static/css/dashboard.css
 reports/datafiles/
 # dashboard/tailwindcss/
+media/
 docker-compose.yml
 Dockerfile
 utils.py
+terraform/

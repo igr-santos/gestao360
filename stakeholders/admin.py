@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.urls import path, reverse
 from django.utils.html import format_html
 
-from .models import Stakeholder, Contact, ContactCard
+from .models import Stakeholder, Contact, ContactCard, StakeholderPayment
 # from .views import ArtistDetailView
 
 
@@ -37,7 +37,11 @@ class ArtistAdmin(admin.ModelAdmin):
     #     return format_html(f'<a href="{url}">📝</a>')
 
 
+class StakeholderPaymentAdmin(admin.ModelAdmin):
+    autocomplete_fields = ["recipient"]
+
 # Register your models here.
 admin.site.register(Stakeholder, ArtistAdmin)
 admin.site.register(Contact)
 admin.site.register(ContactCard)
+admin.site.register(StakeholderPayment, StakeholderPaymentAdmin)

@@ -21,7 +21,7 @@ class SplitLine(models.Model):
     split = models.ForeignKey(Split, on_delete=models.CASCADE)
     owner = models.ForeignKey(Stakeholder, on_delete=models.CASCADE)
     kind = models.CharField(max_length=30, choices=KindSplitLine.choices)
-    value = models.DecimalField(max_digits=5, decimal_places=3)
+    value = models.DecimalField(max_digits=6, decimal_places=3)
 
 
 class SplitSong(models.Model):

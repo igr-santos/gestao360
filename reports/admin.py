@@ -44,7 +44,7 @@ class ReportBelieveAdmin(admin.ModelAdmin):
 
 class DistributionReportAdmin(ReportBelieveAdmin):
     list_display = ("title", "amount")
-    fields = ("title", "csv_file")
+    fields = ("title", "csv_file", "income")
 
     def save_model(
         self, request: Any, obj: DistributionReport, form: Any, change: Any
@@ -69,6 +69,7 @@ class DistributionReportAdmin(ReportBelieveAdmin):
             )
             obj.json_data = df.to_dict(orient="records")
 
+        obj.update_amount()
         super().save_model(request, obj, form, change)
 
 

@@ -76,7 +76,7 @@ def index(request):
 @login_required
 def stakeholders(request):
     # stakeholders
-    context = {"stakeholders": Stakeholder.objects.all()}
+    context = {"stakeholders": Stakeholder.objects.all().order_by('full_name')}
 
     songholders = []
     stakeholder_id = request.GET.get("pk", None)

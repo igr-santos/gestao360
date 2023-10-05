@@ -18,21 +18,6 @@ class SplitAdmin(admin.ModelAdmin):
 
 class SplitReportPaymentAdmin(admin.ModelAdmin):
     list_display = ("title", "amount")
-    list_filter = ["report"]
-    change_list_template = "admin/reports/split/change_list.html"
-
-    def changelist_view(self, request, extra_context=None):
-        response = super().changelist_view(request, extra_context)
-
-        # Extract the final queryset from the ChangeList object
-        change_list = response.context_data["cl"]
-        queryset = change_list.queryset
-
-        # Add context
-        qs = queryset.aggregate(sum=Sum("amount"))
-        response.context_data["rows_amount_sum"] = round(qs["sum"] or 0, 2)
-
-        return response
 
 
 class SplitSongAdmin(admin.ModelAdmin):

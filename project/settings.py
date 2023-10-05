@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "django_select2",
     #
     "dashboard",
+    "accounts",
     "stakeholders",
     "copyright",
     "reports",
