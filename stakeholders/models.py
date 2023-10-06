@@ -44,7 +44,7 @@ class Stakeholder(models.Model):
         return round(amount or 0, 2)
 
     @property
-    def earnings_by_reports(self):
+    def get_sum_reports(self):
         items = []
         amount = 0
 
@@ -67,7 +67,7 @@ class Stakeholder(models.Model):
             for row in rows:
                 amount, ratio, report_id = row
                 items.append({
-                    "report__title": DistributionReport.objects.get(pk=report_id),
+                    "report": DistributionReport.objects.get(pk=report_id),
                     "amount_brl": round(amount * ratio, 2),
                     "amount": round(amount or 0, 2)
                 })
@@ -82,7 +82,7 @@ class Stakeholder(models.Model):
 
     @property
     def debit(self):
-        return round(self.earnings_brl - self.income, 2)
+        return round((self.earnings_brl or 0) - (self.income or 0), 2)
 
 
 class ContactChoices(models.TextChoices):
@@ -111,4 +111,4 @@ class StakeholderPayment(Transaction):
     recipient = models.ForeignKey(Stakeholder, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.amount
+        return self.recipient.full_name
