@@ -15,7 +15,7 @@ LIST_STYLE = TableStyle(
     [
         ('FONTNAME', (0,0), (-1,0), 'Courier-Bold'),
         ('ALIGN', (2,1), (-1,-1), 'RIGHT'),
-        ('FONTNAME', (3,-1), (-1,-1), 'Courier-Bold'),
+        ('FONTNAME', (2,-1), (-1,-1), 'Courier-Bold'),
     ]
 )
 

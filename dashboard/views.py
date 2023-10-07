@@ -111,17 +111,28 @@ def generate_pdf(request, stakeholder_id, report_id):
     rows = []
     query = f"""
 select
-	ss.album,
-	ss.title,
-	round((sp.amount * (dr.income / dr.amount))::numeric, 2) as amount,
-	sl.value as split,
-	round(((sp.amount * (sl.value / 100)) * (dr.income / dr.amount))::numeric, 2) as income
-from split_splitreportpayment sp
-inner join split_splitsong ss on ss.id = sp.split_song_id
-inner join split_splitline sl on sl.split_id = ss.split_id
-inner join stakeholders_stakeholder sh on sh.id = sl.owner_id
-inner join reports_distributionreport dr on dr.id = sp.report_id
-where sh.id = {stakeholder.id} and dr.id = {report.id}
+	UPPER(cs.title) as title,
+	round(sum(sq.amount)::numeric, 2) as amount,
+    sq.split,
+	round(sum(sq.income)::numeric, 2) as income
+from (
+    select
+        split.song_id as song_id,
+        ss.album,
+        ss.title,
+        round((sp.amount * (dr.income / dr.amount))::numeric, 2) as amount,
+        sl.value as split,
+        round(((sp.amount * (sl.value / 100)) * (dr.income / dr.amount))::numeric, 2) as income
+    from split_splitreportpayment sp
+    inner join split_splitsong ss on ss.id = sp.split_song_id
+    inner join split_split split on split.id = ss.split_id 
+    inner join split_splitline sl on sl.split_id = ss.split_id
+    inner join stakeholders_stakeholder sh on sh.id = sl.owner_id
+    inner join reports_distributionreport dr on dr.id = sp.report_id
+    where sh.id = {stakeholder.id} and dr.id = {report.id}
+) as sq
+inner join copyright_song cs on cs.id = sq.song_id
+group by cs.title, sq.split
 """
     with connection.cursor() as cursor:
         cursor.execute(query)
@@ -131,8 +142,8 @@ where sh.id = {stakeholder.id} and dr.id = {report.id}
             # rows.append(dict(album=album, title=title, amount=amount, split=split, income=income))
     
     amount = sum(map(lambda x: x[-1], rows))
-    rows.insert(0, ["Álbum", "Título", "Rendimento (R$)", "Participação (%)", "Lucro liquido (R$)"])
-    rows.append(["", "", "", "TOTAL", amount])
+    rows.insert(0, ["Título", "Rendimento (R$)", "Participação (%)", "Lucro liquido (R$)"])
+    rows.append(["", "", "TOTAL", amount])
 
     return HttpResponse(draw(
         stakeholder_name=stakeholder.full_name,
@@ -142,28 +153,28 @@ where sh.id = {stakeholder.id} and dr.id = {report.id}
 
 
 
-def generate_pdf_file(rows):
-    from io import BytesIO
+# def generate_pdf_file(rows):
+#     from io import BytesIO
  
-    buffer = BytesIO()
-    p = canvas.Canvas(buffer)
+#     buffer = BytesIO()
+#     p = canvas.Canvas(buffer)
  
-    # Create a PDF document
-    books = rows
-    p.drawString(100, 100, "Resumo de ganhos")
+#     # Create a PDF document
+#     books = rows
+#     p.drawString(100, 100, "Resumo de ganhos")
  
-    # y = 700
-    # for book in books:
-    #     print(book)
-    #     p.drawString(100, y, f"Album: {book['album']}")
-    #     p.drawString(100, y, f"Title: {book['title']}")
-    #     p.drawString(100, y - 20, f"Rendimento: {book['amount']}")
-    #     p.drawString(100, y - 40, f"Participação: {book['split']}")
-    #     p.drawString(100, y - 60, f"Ganho: {book['income']}")
-    #     y -= 60
+#     # y = 700
+#     # for book in books:
+#     #     print(book)
+#     #     p.drawString(100, y, f"Album: {book['album']}")
+#     #     p.drawString(100, y, f"Title: {book['title']}")
+#     #     p.drawString(100, y - 20, f"Rendimento: {book['amount']}")
+#     #     p.drawString(100, y - 40, f"Participação: {book['split']}")
+#     #     p.drawString(100, y - 60, f"Ganho: {book['income']}")
+#     #     y -= 60
  
-    p.showPage()
-    p.save()
+#     p.showPage()
+#     p.save()
  
-    buffer.seek(0)
-    return buffer
+#     buffer.seek(0)
+#     return buffer
