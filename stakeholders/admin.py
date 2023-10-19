@@ -39,6 +39,10 @@ class ArtistAdmin(admin.ModelAdmin):
 
 class StakeholderPaymentAdmin(admin.ModelAdmin):
     autocomplete_fields = ["recipient"]
+    list_display = ["description", "transaction_date", "recipient", "transaction_type", "amount"]
+    list_display_links = ["description", "recipient"]
+    ordering = ["-transaction_date"]
+    search_fields = ["recipient__full_name", ]
 
 # Register your models here.
 admin.site.register(Stakeholder, ArtistAdmin)

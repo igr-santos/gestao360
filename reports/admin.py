@@ -43,8 +43,9 @@ class ReportBelieveAdmin(admin.ModelAdmin):
 
 
 class DistributionReportAdmin(ReportBelieveAdmin):
-    list_display = ("title", "amount")
-    fields = ("title", "csv_file", "income")
+    list_display = ("title", "start_date", "end_date", "amount")
+    fields = ("title", "csv_file", "start_date", "end_date", "income")
+    ordering = ['-start_date', '-end_date']
 
     def save_model(
         self, request: Any, obj: DistributionReport, form: Any, change: Any

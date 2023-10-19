@@ -7,14 +7,24 @@ from reportlab.platypus.paragraph import Paragraph
 from reportlab.platypus.tables import Table, TableStyle, colors
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.units import mm
+from reportlab.lib.units import inch
 from pypdf import PdfReader, PdfWriter
 
 
-LIST_STYLE = TableStyle(
+LIST_STYLE_DEFAULT = TableStyle(
     [
         ('FONTNAME', (0,0), (-1,0), 'Courier-Bold'),
-        ('ALIGN', (2,1), (-1,-1), 'RIGHT'),
+        ('ALIGN', (1,0), (-1,-1), 'RIGHT'),
+        ('FONTSIZE', (0,0), (-1,-1), 8),
+        # ('FONTNAME', (2,-1), (-1,-1), 'Courier-Bold'),
+    ]
+)
+
+LIST_STYLE_FOOTER = TableStyle(
+    [
+        ('FONTNAME', (0,0), (-1,0), 'Courier-Bold'),
+        ('ALIGN', (1,0), (-1,-1), 'RIGHT'),
+        ('FONTSIZE', (0,0), (-1,-2), 8),
         ('FONTNAME', (2,-1), (-1,-1), 'Courier-Bold'),
     ]
 )
@@ -33,7 +43,7 @@ STYLE2 = ParagraphStyle(
 )
 
 
-def draw(stakeholder_name, title, rows):
+def create_page(title, stakeholder_name, rows, style=LIST_STYLE_DEFAULT, page=None, page_size=None):
     from io import BytesIO, StringIO
 
     width, height = A4
@@ -49,28 +59,51 @@ def draw(stakeholder_name, title, rows):
     elements.append(p)
     p = Paragraph(stakeholder_name, STYLE2)
     elements.append(p)
-    elements.append(Spacer(1, 50))
+    if page and page_size:
+        p = Paragraph(f"{page} / {page_size}", STYLE)
+        elements.append(p)
+    elements.append(Spacer(1, 40))
 
-    table = Table(rows)
-    table.setStyle(LIST_STYLE)
+    table = Table(rows, colWidths=[2.5*inch,1.5*inch,1.5*inch,1.5*inch])
+    table.setStyle(style)
     elements.append(table)
 
     c.build(elements)
 
     buffer.seek(0)
 
-    new_pdf = PdfReader(buffer)
-    existing_pdf = PdfReader(open(settings.BASE_DIR / "dashboard/static/documents/Papel-timbrado-Produto-Marginal.pdf", "rb"))
+    return PdfReader(buffer)
+
+def draw(stakeholder_name, title, header, footer, rows):
+    from io import BytesIO, StringIO
 
     tmp = BytesIO()
     output = PdfWriter()
-    page = existing_pdf.pages[0]
-    page.merge_page(new_pdf.pages[0])
+    page_size = 25
+    pages = int(len(rows) / page_size)
 
-    output.add_page(page)
+    for index in range(0, pages + 1):
+        slice_start = index * page_size
+        slice_end = (index + 1) * page_size
+        table_rows = [header] + rows[slice_start:slice_end]
+        if index == pages:
+            table_rows.append(footer)
+
+        new_pdf = create_page(
+            title,
+            stakeholder_name,
+            table_rows,
+            style=LIST_STYLE_FOOTER if index == pages else LIST_STYLE_DEFAULT,
+            page=index+1,
+            page_size=pages+1
+        )
+        existing_pdf = PdfReader(open(settings.BASE_DIR / "dashboard/static/documents/Papel-timbrado-Produto-Marginal.pdf", "rb"))
+        page = existing_pdf.pages[0]
+        page.merge_page(new_pdf.pages[0])
+        output.add_page(page)
 
     output.write(tmp)
 
     tmp.seek(0)
     return tmp
-    
+        

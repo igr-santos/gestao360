@@ -16,11 +16,12 @@ Including another URLconf
 """
 from django.urls import path, include
 
-from .views import index, stakeholders, generate_pdf
+from .views import index, reports, stakeholders, generate_pdf
 
 urlpatterns = [
     path("", index, name="index"),
     path("auth/", include("django.contrib.auth.urls")),
+    path("reports/", reports, name="reports"),
     path("stakeholders/", stakeholders, name="stakeholders"),
     path("generate_pdf/<int:stakeholder_id>/<int:report_id>/", generate_pdf, name="generate_pdf"),
 ]

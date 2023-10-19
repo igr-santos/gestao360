@@ -21,27 +21,16 @@ class Stakeholder(models.Model):
 
         with connection.cursor() as cursor:
             query = f"""
-                select
-                    sum(agg.amount * agg.ratio) as amount
-                from (
-                    select
-                        sum((sp.amount * (sl.value / 100))) as amount,
-                        (dr.income / dr.amount) as ratio,
-                        dr.id as report_id
-                    from split_splitreportpayment sp
-                    inner join split_splitsong ss on ss.id = sp.split_song_id
-                    inner join split_splitline sl on sl.split_id = ss.split_id
-                    inner join stakeholders_stakeholder sh on sh.id = sl.owner_id
-                    inner join reports_distributionreport dr on dr.id = sp.report_id
-                    where sh.id = {self.id}
-                    group by dr.id, dr.income, dr.amount
-                ) as agg
+                SELECT
+                    SUM(ss.exchange_income) as exchange_income
+                FROM public.view_split_songs as ss
+                WHERE ss.stakeholder_id = {self.id}
             """
             cursor.execute(query)
             row = cursor.fetchone()
             amount = row[0]
         
-        return round(amount or 0, 2)
+        return amount or 0
 
     @property
     def get_sum_reports(self):
@@ -50,29 +39,30 @@ class Stakeholder(models.Model):
 
         with connection.cursor() as cursor:
             query = f"""
-                select
-                    sum((sp.amount * (sl.value / 100))) as amount,
-                    (dr.income / dr.amount) as ratio,
-                    dr.id as report_id
-                from split_splitreportpayment sp
-                inner join split_splitsong ss on ss.id = sp.split_song_id
-                inner join split_splitline sl on sl.split_id = ss.split_id
-                inner join stakeholders_stakeholder sh on sh.id = sl.owner_id
-                inner join reports_distributionreport dr on dr.id = sp.report_id
-                where sh.id = {self.id}
-                group by dr.id, dr.income, dr.amount
+                SELECT
+                    ss.distributionreport_id,
+                    ROUND(SUM(ss.amount)::numeric, 2) as amount,
+                    SUM(ss.exchange_amount) as exchange_amount,
+                    ROUND(SUM(ss.income)::numeric, 2) as income,
+                    SUM(ss.exchange_income) as exchange_income
+                FROM public.view_split_songs as ss
+                INNER JOIN reports_distributionreport dr ON dr.id = ss.distributionreport_id
+                WHERE ss.stakeholder_id = {self.id}
+                GROUP BY ss.distributionreport_id, dr.start_date
+                ORDER BY dr.start_date desc
             """
             cursor.execute(query)
             rows = cursor.fetchall()
             for row in rows:
-                amount, ratio, report_id = row
+                report_id, amount, exchange_amount, income, exchange_income = row
                 items.append({
                     "report": DistributionReport.objects.get(pk=report_id),
-                    "amount_brl": round(amount * ratio, 2),
-                    "amount": round(amount or 0, 2)
+                    "amount": amount,
+                    "exchange_amount": exchange_amount,
+                    "income": income,
+                    "exchange_income": exchange_income,
                 })
 
-        
         return items
 
     @property
@@ -82,7 +72,7 @@ class Stakeholder(models.Model):
 
     @property
     def debit(self):
-        return round((self.earnings_brl or 0) - (self.income or 0), 2)
+        return round(float(self.earnings_brl or 0) - float(self.income or 0), 2)
 
 
 class ContactChoices(models.TextChoices):

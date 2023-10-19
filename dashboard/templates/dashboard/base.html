@@ -3,7 +3,7 @@
 <html>
   <head>
     <title>Dashboard</title>
-    <link href="{% static 'css/dashboard.css' %}?version=3" rel="stylesheet" />
+    <link href="{% static 'css/dashboard.css' %}?version=1" rel="stylesheet" />
   </head>
   <body class="h-screen">
     <div class="fixed top-0 w-full block bg-base-300 h-12 z-50 print:hidden">
@@ -13,6 +13,8 @@
         </div>
         <div class="flex flex-1 justify-center gap-4 items-center">
           <a class="link hover:text-primary-focus flex gap-2" href="{% url 'index' %}" target="_self">Home</a>
+          <span>/</span>
+          <a class="link hover:text-primary-focus flex gap-2" href="{% url 'reports' %}" target="_self">Relatórios</a>
           <span>/</span>
           <a class="link hover:text-primary-focus flex gap-2" href="{% url 'stakeholders' %}" target="_self">Partes Interessadas</a>
           <span>/</span>

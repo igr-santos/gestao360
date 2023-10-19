@@ -97,6 +97,9 @@
                     <thead class="bg-white">
                         <tr>
                             <th>Nome do relatório</th>
+                            <th>Rendimento (EUR)</th>
+                            <th>Rendimento (BRL)</th>
+                            <th>Ganhos (EUR)</th>
                             <th>Ganhos (BRL)</th>
                             <th>Ação</th>
                         </tr>
@@ -104,7 +107,10 @@
                     {% for item in stakeholder.get_sum_reports %}
                     <tr>
                         <td>{{ item.report.title }}</td>
-                        <td>{{ item.amount_brl }}</td>
+                        <td>{{ item.amount }}</td>
+                        <td>{{ item.exchange_amount }}</td>
+                        <td>{{ item.income }}</td>
+                        <td>{{ item.exchange_income }}</td>
                         <td><a href="{% url 'generate_pdf' stakeholder_id=stakeholder.id report_id=item.report.id %}" target="_blank">Baixar resumo</a></td>
                     </tr>
                     {% endfor %}

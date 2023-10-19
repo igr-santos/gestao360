@@ -18,9 +18,13 @@ from .pdfutils import draw
 from .forms import DataframeFilter
 
 
-# Create your views here.
 @login_required
 def index(request):
+    return render(request, "dashboard/index.html")
+
+
+@login_required
+def reports(request):
     # Dados de entrada Dafaframe
     # report = Report.objects.first()
     report = DistributionReport.objects.first()
@@ -69,7 +73,7 @@ def index(request):
 
     return render(
         request,
-        "dashboard/index.html",
+        "dashboard/reports.html",
         {
             "report": report,
             "dataframe": dataframe.loc[offset:size],
@@ -89,7 +93,7 @@ def stakeholders(request):
         stakeholder = Stakeholder.objects.get(pk=stakeholder_id)
 
         songholders = SongHolder.objects.filter(holder=stakeholder)
-        splitlines = SplitLine.objects.filter(owner=stakeholder)
+        splitlines = SplitLine.objects.filter(owner=stakeholder).order_by('split__song__title')
 
         context.update(
             {
@@ -110,29 +114,16 @@ def generate_pdf(request, stakeholder_id, report_id):
 
     rows = []
     query = f"""
-select
-	UPPER(cs.title) as title,
-	round(sum(sq.amount)::numeric, 2) as amount,
-    sq.split,
-	round(sum(sq.income)::numeric, 2) as income
-from (
-    select
-        split.song_id as song_id,
-        ss.album,
-        ss.title,
-        round((sp.amount * (dr.income / dr.amount))::numeric, 2) as amount,
-        sl.value as split,
-        round(((sp.amount * (sl.value / 100)) * (dr.income / dr.amount))::numeric, 2) as income
-    from split_splitreportpayment sp
-    inner join split_splitsong ss on ss.id = sp.split_song_id
-    inner join split_split split on split.id = ss.split_id 
-    inner join split_splitline sl on sl.split_id = ss.split_id
-    inner join stakeholders_stakeholder sh on sh.id = sl.owner_id
-    inner join reports_distributionreport dr on dr.id = sp.report_id
-    where sh.id = {stakeholder.id} and dr.id = {report.id}
-) as sq
-inner join copyright_song cs on cs.id = sq.song_id
-group by cs.title, sq.split
+    SELECT
+        UPPER(title) as title,
+        SUM(exchange_amount) as exchange_amount,
+        split,
+        SUM(exchange_income) as exchange_income
+    FROM public.view_split_songs
+    WHERE distributionreport_id = {report.id}
+    AND stakeholder_id = {stakeholder.id}
+    GROUP BY title, split
+    ORDER BY title
 """
     with connection.cursor() as cursor:
         cursor.execute(query)
@@ -142,12 +133,14 @@ group by cs.title, sq.split
             # rows.append(dict(album=album, title=title, amount=amount, split=split, income=income))
     
     amount = sum(map(lambda x: x[-1], rows))
-    rows.insert(0, ["Título", "Rendimento (R$)", "Participação (%)", "Lucro liquido (R$)"])
-    rows.append(["", "", "TOTAL", amount])
+    # rows.insert(0, ["Título", "Rendimento (R$)", "Participação (%)", "Lucro liquido (R$)"])
+    # rows.append(["", "", "TOTAL", amount])
 
     return HttpResponse(draw(
         stakeholder_name=stakeholder.full_name,
         title=f"Relatório: {report.title}",
+        header=["Título", "Rendimento (R$)", "Participação (%)", "Lucro liquido (R$)"],
+        footer=["", "", "TOTAL", amount],
         rows=rows
     ), content_type='application/pdf')
 
