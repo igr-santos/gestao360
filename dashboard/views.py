@@ -145,6 +145,43 @@ def generate_pdf(request, stakeholder_id, report_id):
     ), content_type='application/pdf')
 
 
+@login_required
+def generate_pdf_eur(request, stakeholder_id, report_id):
+    report = DistributionReport.objects.get(pk=report_id)
+    stakeholder = Stakeholder.objects.get(pk=stakeholder_id)
+
+    rows = []
+    query = f"""
+    SELECT
+        UPPER(title) as title,
+        SUM(amount) as amount,
+        split,
+        SUM(income) as income
+    FROM public.view_split_songs
+    WHERE distributionreport_id = {report.id}
+    AND stakeholder_id = {stakeholder.id}
+    GROUP BY title, split
+    ORDER BY title
+"""
+    with connection.cursor() as cursor:
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        # for row in cursor.fetchall():
+            # album, title, amount, split, income = row
+            # rows.append(dict(album=album, title=title, amount=amount, split=split, income=income))
+    
+    amount = round(sum(map(lambda x: x[-1], rows)), 2)
+    # rows.insert(0, ["Título", "Rendimento (R$)", "Participação (%)", "Lucro liquido (R$)"])
+    # rows.append(["", "", "TOTAL", amount])
+
+    return HttpResponse(draw(
+        stakeholder_name=stakeholder.full_name,
+        title=f"Relatório: {report.title} (EURO)",
+        header=["Título", "Rendimento (EUR)", "Participação (%)", "Lucro liquido (EUR)"],
+        footer=["", "", "TOTAL", amount],
+        rows=rows
+    ), content_type='application/pdf')
+
 
 # def generate_pdf_file(rows):
 #     from io import BytesIO

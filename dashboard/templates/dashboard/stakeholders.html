@@ -111,7 +111,11 @@
                         <td>{{ item.exchange_amount }}</td>
                         <td>{{ item.income }}</td>
                         <td>{{ item.exchange_income }}</td>
-                        <td><a href="{% url 'generate_pdf' stakeholder_id=stakeholder.id report_id=item.report.id %}" target="_blank">Baixar resumo</a></td>
+                        <td>
+                            <a href="{% url 'generate_pdf' stakeholder_id=stakeholder.id report_id=item.report.id %}" target="_blank">Baixar resumo</a>
+                            |
+                            <a href="{% url 'generate_pdf_eur' stakeholder_id=stakeholder.id report_id=item.report.id %}" target="_blank">Baixar resumo EURO</a>
+                        </td>
                     </tr>
                     {% endfor %}
                 </table>

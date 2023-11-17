@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.urls import path, include
 
-from .views import index, reports, stakeholders, generate_pdf
+from .views import index, reports, stakeholders, generate_pdf, generate_pdf_eur
 
 urlpatterns = [
     path("", index, name="index"),
@@ -24,4 +24,5 @@ urlpatterns = [
     path("reports/", reports, name="reports"),
     path("stakeholders/", stakeholders, name="stakeholders"),
     path("generate_pdf/<int:stakeholder_id>/<int:report_id>/", generate_pdf, name="generate_pdf"),
+    path("generate_pdf_eur/<int:stakeholder_id>/<int:report_id>/", generate_pdf_eur, name="generate_pdf_eur"),
 ]
