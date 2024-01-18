@@ -14,6 +14,7 @@ from pypdf import PdfReader, PdfWriter
 LIST_STYLE_DEFAULT = TableStyle(
     [
         ('FONTNAME', (0,0), (-1,0), 'Courier-Bold'),
+        ('LINEBELOW', (0,0), (-1,0), 0.25, colors.black),
         ('ALIGN', (1,0), (-1,-1), 'RIGHT'),
         ('FONTSIZE', (0,0), (-1,-1), 8),
         # ('FONTNAME', (2,-1), (-1,-1), 'Courier-Bold'),
@@ -23,8 +24,10 @@ LIST_STYLE_DEFAULT = TableStyle(
 LIST_STYLE_FOOTER = TableStyle(
     [
         ('FONTNAME', (0,0), (-1,0), 'Courier-Bold'),
+        ('LINEBELOW', (0,0), (-1,0), 0.25, colors.black),
         ('ALIGN', (1,0), (-1,-1), 'RIGHT'),
         ('FONTSIZE', (0,0), (-1,-2), 8),
+        ('LINEABOVE', (0,-1), (-1,-1), 0.25, colors.gray),
         ('FONTNAME', (2,-1), (-1,-1), 'Courier-Bold'),
     ]
 )
@@ -64,7 +67,7 @@ def create_page(title, stakeholder_name, rows, style=LIST_STYLE_DEFAULT, page=No
         elements.append(p)
     elements.append(Spacer(1, 40))
 
-    table = Table(rows, colWidths=[2.5*inch,1.5*inch,1.5*inch,1.5*inch])
+    table = Table(rows, colWidths=[2.5*inch,1.2*inch,1.3*inch,1.3*inch,1.2*inch])
     table.setStyle(style)
     elements.append(table)
 

@@ -1,0 +1,85 @@
+{% extends 'dashboard/stakeholders/base.html' %}
+{% load dashboard %}
+
+{% block head_title %}Gestão360º | Pagamentos{% endblock %}
+
+{% block content %}
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Pagamentos</h1>
+</div>
+
+<!-- Content Row -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow mb-4">
+            <!-- Card Header - Dropdown -->
+            <div
+                class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Relatório: {{ distributionreport.title }}</h6>
+            </div>
+            <!-- Card Body -->
+            <div class="card-body">
+                <p>{{ distributionreport.start_date }} - {{ distributionreport.end_date }}</p>
+                <p>{{ distributionreport.income }}</p>
+                <p>{{ distributionreport.get_payment_status_display }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="card shadow mb-4">
+            <!-- Card Header - Dropdown -->
+            {% comment %} <div
+                class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Top 5: {{ report.title }}</h6>
+            </div> {% endcomment %}
+            <!-- Card Body -->
+            <div class="card-body">
+                <div class="pt-2 pb-2">
+                    <table class="table table-borderless table-hover table-xs">
+                        <thead>
+                          <tr>
+                            <th scope="col" class="text-xs">#</th>
+                            <th scope="col" class="text-xs">Recebedor</th>
+                            <th scope="col" class="text-xs">Participações</th>
+                            <th scope="col" class="text-xs">Quantidade</th>
+                            <th scope="col" class="text-xs">Valor a pagar</th>
+                            <th scope="col" class="text-xs">Ações</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                            {% for payment in payments %}
+                            <tr>
+                                <th scope="row" class="text-xs">{{ forloop.counter }}</th>
+                                <td class="text-xs">{{ payment.stakeholder.full_name }}</td>
+                                <td class="text-xs">{{ payment.total_shares }}</td>
+                                <td class="text-xs">{{ payment.total_quantity|display_numbers }}</td>
+                                <td class="text-xs">{{ payment.total_earnings|display_numbers }}</td>
+                                <td class="text-xs">
+                                    <div>
+                                        <a href="{% url 'generate_pdf' payment.stakeholder.id distributionreport.id %}" class="btn btn-sm{% if payment.paid %} btn-success{% else %} btn-secondary{% endif %}" target="_blank">
+                                            <span class="fa fa-print"></span> Recibo
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% comment %} <div class="mt-4 text-center small">
+                    <span class="mr-2">
+                        <i class="fas fa-circle text-primary"></i> Direct
+                    </span>
+                    <span class="mr-2">
+                        <i class="fas fa-circle text-success"></i> Social
+                    </span>
+                    <span class="mr-2">
+                        <i class="fas fa-circle text-info"></i> Referral
+                    </span>
+                </div> {% endcomment %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

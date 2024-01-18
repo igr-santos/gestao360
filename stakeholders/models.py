@@ -1,5 +1,6 @@
 from django.db import connection, models
 from django.db.models import Sum
+from django.contrib.auth.models import User
 # from django.db.models.expressions import RawSQL
 
 from accounts.models import Transaction
@@ -11,6 +12,9 @@ class Stakeholder(models.Model):
     full_name = models.CharField(max_length=180)
     artist_name = models.CharField(max_length=100)
     related_artist = models.BooleanField(default=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    payment_detail = models.TextField(null=True, blank=True)
+
 
     def __str__(self):
         return self.full_name
@@ -24,7 +28,9 @@ class Stakeholder(models.Model):
                 SELECT
                     SUM(ss.exchange_income) as exchange_income
                 FROM public.view_split_songs as ss
+                INNER JOIN public.reports_distributionreport dr ON dr.id = ss.distributionreport_id 
                 WHERE ss.stakeholder_id = {self.id}
+                AND dr.payment_status = 'done'
             """
             cursor.execute(query)
             row = cursor.fetchone()
@@ -68,7 +74,7 @@ class Stakeholder(models.Model):
     @property
     def income(self):
         agg = StakeholderPayment.objects.filter(recipient=self).aggregate(amount=Sum("amount"))
-        return agg.get("amount", 0)
+        return round(agg.get("amount") or 0, 2)
 
     @property
     def debit(self):

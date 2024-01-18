@@ -20,7 +20,7 @@ def export_selected_objects(modeladmin, request, queryset):
 class ArtistAdmin(admin.ModelAdmin):
     actions = [export_selected_objects]
     search_fields = ["full_name", "artist_name"]
-    list_display = ['artist_name', 'full_name']
+    list_display = ['artist_name', 'full_name', "user"]
 
     # def get_urls(self):
     #     return [

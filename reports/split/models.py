@@ -33,6 +33,7 @@ class SplitSong(models.Model):
 class SplitReportPayment(models.Model):
     report = models.ForeignKey(DistributionReport, on_delete=models.CASCADE)
     split_song = models.ForeignKey(SplitSong, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=0)
     amount = models.FloatField()
 
     @property

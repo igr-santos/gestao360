@@ -1,0 +1,54 @@
+{% extends "dashboard/stakeholders/base.html" %}
+
+{% block head_title %}Gestão360º | Relatórios{% endblock %}
+
+{% block content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Relatórios</h1>
+    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+            class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6>
+        <form method="GET">
+            {{ filter.report }}
+            {% comment %} <select name="{{ filter.report.name }}">
+                <option>Selecione um relatório</option>
+                {% for report in reports %}
+                <option value="{{report.distributionreport_id}}"{% if filter.report.value == report.distributionreport_id %} selected{% endif %}>{{ report.report_title }}</option>
+                {% endfor %}
+            </select> {% endcomment %}
+            <button type="submit">Gerar relatório</button>
+        </form>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Fonograma</th>
+                        <th>Quantidade</th>
+                        <th>Rendimento total</th>
+                        <th>Participação (%)</th>
+                        <th>Rendimento</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for split_song in split_songs %}
+                    <tr>
+                        <td>{{ split_song.title }}</td>
+                        <td>{{ split_song.quantity }}
+                        <td>{{ split_song.amount }}</td>
+                        <td>{{ split_song.split }}</td>
+                        <td>{{ split_song.income }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -21,3 +21,15 @@ class DataframeFilter(forms.Form):
         self.base_fields["columns"].choices = list(map(lambda x: (x, x), columns))
 
         self.base_fields["groupby"].choices = list(map(lambda x: (x, x), columns))
+
+
+
+class StakeholderReportFilter(forms.Form):
+    report = forms.ChoiceField(required=False)
+
+    def __init__(self, choices, *args, **kwargs):
+        self.base_fields['report'].choices = [("", "Selecione seu relatório")] + choices
+
+        super().__init__(*args, **kwargs)
+
+        

@@ -11,7 +11,7 @@ from .split.models import SplitReportPayment, SplitSong
 
 class ReportBelieveAdmin(admin.ModelAdmin):
     index_columns = [{"album": "Título do lançamento"}, {"title": "Titulo da faixa"}]
-    sum_columns = ["Lucro Líquido"]
+    sum_columns = ["Quantidade", "Lucro Líquido"]
 
     def save_model(self, request: Any, obj: Any, form: Any, change: Any) -> None:
         super().save_model(request, obj, form, change)
@@ -38,14 +38,15 @@ class ReportBelieveAdmin(admin.ModelAdmin):
                 split_song, created = SplitSong.objects.get_or_create(**params)
 
                 SplitReportPayment.objects.get_or_create(
-                    report=obj, split_song=split_song, amount=row[self.sum_columns[0]]
+                    report=obj, split_song=split_song, quantity=row[self.sum_columns[0]], amount=row[self.sum_columns[1]]
                 )
 
 
 class DistributionReportAdmin(ReportBelieveAdmin):
-    list_display = ("title", "start_date", "end_date", "amount")
-    fields = ("title", "csv_file", "start_date", "end_date", "income")
+    list_display = ("title", "start_date", "end_date", "payment_status", "amount")
+    fields = ("title", "csv_file", "start_date", "end_date", "payment_status", "income")
     ordering = ['-start_date', '-end_date']
+    search_fields = ("title", )
 
     def save_model(
         self, request: Any, obj: DistributionReport, form: Any, change: Any
